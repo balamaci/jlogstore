@@ -1,6 +1,6 @@
 package ro.balamaci.jlogstore;
 
-import ro.balamaci.jlogstore.es.ElasticSearchPublisher;
+import ro.balamaci.jlogstore.publisher.es.ElasticSearchPublisher;
 import ro.balamaci.jlogstore.server.Server;
 import ro.balamaci.jlogstore.storage.ChronicleQueueStorage;
 import ro.balamaci.jlogstore.tailer.ChronicleTailer;
