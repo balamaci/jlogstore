@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class InMemoryPublisher implements IPublisher {
+public class InMemoryPublisher implements Publisher {
 
     private Map<String, List<String>> publishers = new HashMap<>();
 

@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author sbalamaci
  */
-public class ChronicleQueueStorage implements IStorage {
+public class ChronicleQueueStorage implements Storage {
 
     private ConcurrentHashMap<String, ChronicleQueue> queues = new ConcurrentHashMap<>();
 

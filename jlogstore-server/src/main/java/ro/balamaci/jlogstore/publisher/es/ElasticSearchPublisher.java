@@ -1,11 +1,11 @@
 package ro.balamaci.jlogstore.publisher.es;
 
-import ro.balamaci.jlogstore.publisher.IPublisher;
+import ro.balamaci.jlogstore.publisher.Publisher;
 
 /**
  * @author sbalamaci
  */
-public class ElasticSearchPublisher implements IPublisher {
+public class ElasticSearchPublisher implements Publisher {
 
 
     @Override

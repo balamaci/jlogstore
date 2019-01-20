@@ -2,7 +2,7 @@ package ro.balamaci.jlogstore.tailer;
 
 import net.openhft.chronicle.queue.ChronicleQueue;
 import net.openhft.chronicle.queue.ExcerptTailer;
-import ro.balamaci.jlogstore.publisher.IPublisher;
+import ro.balamaci.jlogstore.publisher.Publisher;
 import ro.balamaci.jlogstore.storage.ChronicleQueueStorage;
 
 import java.util.Enumeration;
@@ -25,12 +25,12 @@ public class ChronicleTailer {
     private static final int SLEEP_MILLIS_NO_DATA = 1000;
 
     private ChronicleQueueStorage storage;
-    private IPublisher publisher;
+    private Publisher publisher;
     private int itemsToRead;
 
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-    public ChronicleTailer(ChronicleQueueStorage storage, IPublisher publisher, int itemsToRead) {
+    public ChronicleTailer(ChronicleQueueStorage storage, Publisher publisher, int itemsToRead) {
         this.storage = storage;
         this.publisher = publisher;
         this.itemsToRead = itemsToRead;
@@ -87,7 +87,7 @@ public class ChronicleTailer {
         shouldStop = true;
     }
 
-    public void signalShutdownIdNoNewDataAvailable() {
+    public void signalShutdownIfNoNewDataAvailable() {
         shouldStopIfNoDataAvailable = true;
     }
 

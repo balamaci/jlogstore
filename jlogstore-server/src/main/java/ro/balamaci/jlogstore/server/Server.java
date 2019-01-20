@@ -6,7 +6,7 @@ import io.rsocket.Payload;
 import io.rsocket.RSocketFactory;
 import io.rsocket.transport.netty.server.TcpServerTransport;
 import reactor.core.publisher.Mono;
-import ro.balamaci.jlogstore.storage.IStorage;
+import ro.balamaci.jlogstore.storage.Storage;
 
 /**
  * @author sbalamaci
@@ -15,9 +15,9 @@ public class Server {
 
     private final int port;
 
-    private IStorage storage;
+    private Storage storage;
 
-    public Server(int port, IStorage storage) {
+    public Server(int port, Storage storage) {
         this.port = port;
         this.storage = storage;
     }

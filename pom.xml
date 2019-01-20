@@ -40,6 +40,13 @@
             <version>${slf4j.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.4</version>
+        </dependency>
+
+
         <!--- TEST libraries -->
         <dependency>
             <groupId>org.slf4j</groupId>

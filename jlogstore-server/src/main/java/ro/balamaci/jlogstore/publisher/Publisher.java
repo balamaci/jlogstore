@@ -1,6 +1,6 @@
 package ro.balamaci.jlogstore.publisher;
 
-public interface IPublisher {
+public interface Publisher {
 
     void publish(String logId, String json);
 

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.support.io.TempDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ro.balamaci.jlogstore.generator.FakeJsonLogEventGenerator;
 import ro.balamaci.jlogstore.publisher.InMemoryPublisher;
 import ro.balamaci.jlogstore.storage.ChronicleQueueStorage;
 import ro.balamaci.jlogstore.tailer.ChronicleTailer;
@@ -38,11 +39,12 @@ public class TailerTest {
         ChronicleTailer chronicleTailer = new ChronicleTailer(chronicleQueueStorage, memoryPublisher, 5);
         chronicleTailer.start();
 
-        chronicleTailer.signalShutdownIdNoNewDataAvailable();
+        chronicleTailer.signalShutdownIfNoNewDataAvailable();
         chronicleTailer.awaitShutdown(1, TimeUnit.MINUTES);
 
-        int publishedEvents = memoryPublisher.getPublished(logId).size();
-        log.info("Published {}", publishedEvents);
+        List<String> publishedEvents = memoryPublisher.getPublished(logId);
+        log.info("Published {}", publishedEvents.size());
+        publishedEvents.stream().limit(10).forEach((json) -> log.info("Event {}", json));
     }
 
 }

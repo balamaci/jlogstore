@@ -1,6 +1,4 @@
-package ro.balamaci.jlogstore;
-
-import com.fasterxml.jackson.core.JsonGenerator;
+package ro.balamaci.jlogstore.generator.event;
 
 public class LogEvent {
 
@@ -12,15 +10,16 @@ public class LogEvent {
 
     private String message;
 
+
     public LogEvent() {
     }
 
     public LogEvent(String message) {
         this.message = message;
-        this.level = Level.INFO;
-        this.loggerName = this.getClass().getName();
-        this.threadName = "main";
+        level = Level.INFO;
+        loggerName = this.getClass().getName();
     }
+
 
     public String getThreadName() {
         return threadName;
@@ -60,5 +59,7 @@ public class LogEvent {
         WARN,
         ERROR
     }
+
+
 
 }
