@@ -11,13 +11,13 @@ import ro.balamaci.jlogstore.storage.Storage;
 /**
  * @author sbalamaci
  */
-public class Server {
+public class RSocketServer {
 
     private final int port;
 
     private Storage storage;
 
-    public Server(int port, Storage storage) {
+    public RSocketServer(int port, Storage storage) {
         this.port = port;
         this.storage = storage;
     }

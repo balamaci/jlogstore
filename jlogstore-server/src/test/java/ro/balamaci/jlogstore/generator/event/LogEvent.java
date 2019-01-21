@@ -1,5 +1,7 @@
 package ro.balamaci.jlogstore.generator.event;
 
+import java.time.LocalDateTime;
+
 public class LogEvent {
 
     private String threadName;
@@ -10,6 +12,8 @@ public class LogEvent {
 
     private String message;
 
+    private LocalDateTime timestamp;
+
 
     public LogEvent() {
     }
@@ -18,6 +22,12 @@ public class LogEvent {
         this.message = message;
         level = Level.INFO;
         loggerName = this.getClass().getName();
+        timestamp = LocalDateTime.now();
+    }
+
+    public LogEvent(String message, LocalDateTime timestamp) {
+        this(message);
+        this.timestamp = timestamp;
     }
 
 
@@ -51,6 +61,14 @@ public class LogEvent {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(LocalDateTime timestamp) {
+        this.timestamp = timestamp;
     }
 
     public enum Level {

@@ -1,8 +1,12 @@
 package ro.balamaci.jlogstore.generator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import ro.balamaci.jlogstore.generator.event.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -10,6 +14,11 @@ import java.util.Random;
 public class FakeJsonLogEventGenerator {
 
     private ObjectMapper objectMapper = new ObjectMapper();
+    {
+        JavaTimeModule javaTimeModule = new JavaTimeModule();
+        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ISO_DATE_TIME));
+        objectMapper.registerModule(javaTimeModule);
+    }
 
     public List<String> generateJsonLogEvents(int events) {
         try {
