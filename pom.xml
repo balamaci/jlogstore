@@ -19,8 +19,8 @@
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <rsocket.version>0.11.14</rsocket.version>
         <slf4j.version>1.7.25</slf4j.version>
-        <logback.version>1.1.8</logback.version>
         <junit.version>5.4.0-M1</junit.version>
     </properties>
 
@@ -40,10 +40,17 @@
             <version>${slf4j.version}</version>
         </dependency>
 
+
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.4</version>
+            <groupId>io.rsocket</groupId>
+            <artifactId>rsocket-core</artifactId>
+            <version>${rsocket.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.rsocket</groupId>
+            <artifactId>rsocket-transport-netty</artifactId>
+            <version>${rsocket.version}</version>
         </dependency>
 
 
