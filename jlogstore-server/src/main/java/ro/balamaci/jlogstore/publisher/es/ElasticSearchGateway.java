@@ -1,7 +1,10 @@
 package ro.balamaci.jlogstore.publisher.es;
 
 import org.apache.http.HttpHost;
+import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
+import org.elasticsearch.action.admin.indices.template.put.PutIndexTemplateRequest;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -23,11 +26,20 @@ public class ElasticSearchGateway {
         restClient = new RestHighLevelClient(RestClient.builder(hosts));
     }
 
-    void index(String json) throws IOException  {
-        IndexRequest indexRequest = new IndexRequest("people");
+    void index(String index, String json) throws IOException  {
+        IndexRequest indexRequest = new IndexRequest(index);
         indexRequest.source(json, XContentType.JSON);
 
-        restClient.index(indexRequest, RequestOptions.DEFAULT);
+        IndexResponse indexResponse = restClient.index(indexRequest, RequestOptions.DEFAULT);
+        int status = indexResponse.status().getStatus();
+        System.out.println("status " + status);
+    }
+
+    void putIndexTemplate(String templateName, String json) throws IOException  {
+        PutIndexTemplateRequest putIndexTemplateRequest = new PutIndexTemplateRequest(templateName);
+        putIndexTemplateRequest.source(json, XContentType.JSON);
+
+        restClient.indices().putTemplate(putIndexTemplateRequest, RequestOptions.DEFAULT);
     }
 
 }
