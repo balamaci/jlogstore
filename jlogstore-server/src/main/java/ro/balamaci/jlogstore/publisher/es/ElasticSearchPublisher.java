@@ -20,7 +20,7 @@ public class ElasticSearchPublisher implements Publisher {
     @Override
     public void publish(String logId, String json) {
         try {
-            elasticSearchGateway.index(json);
+            elasticSearchGateway.index(logId, json);
         } catch (IOException e) {
             throw new PublishException(e);
         }

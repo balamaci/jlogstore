@@ -2,25 +2,33 @@ package ro.balamaci.jlogstore.logback.appender;
 
 import ch.qos.logback.core.encoder.Encoder;
 import ch.qos.logback.core.spi.DeferredProcessingAware;
+import io.rsocket.RSocket;
+import io.rsocket.RSocketFactory;
+import io.rsocket.transport.netty.client.TcpClientTransport;
+import io.rsocket.util.DefaultPayload;
 import net.logstash.logback.appender.AsyncDisruptorAppender;
 import net.logstash.logback.appender.destination.DestinationParser;
 import net.logstash.logback.appender.listener.TcpAppenderListener;
 import net.logstash.logback.encoder.com.lmax.disruptor.EventHandler;
 import net.logstash.logback.encoder.com.lmax.disruptor.LifecycleAware;
+import reactor.core.publisher.Mono;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 /**
- * This class borrows much from the
+ * This class borrows much from the {@link net.logstash.logback.appender.AbstractLogstashTcpSocketAppender }
  *
  * @author sbalamaci
  */
 public class LogbackRSocketAppender<Event extends DeferredProcessingAware, Listener extends TcpAppenderListener<Event>>
         extends AsyncDisruptorAppender<Event, Listener> {
+
+    private volatile boolean started = false;
 
     /**
      * The encoder which is ultimately responsible for writing the event
@@ -44,28 +52,37 @@ public class LogbackRSocketAppender<Event extends DeferredProcessingAware, Liste
     public static final int DEFAULT_PORT = 7878;
 
     /**
-     * Event handler responsible for performing the TCP transmission.
+     * Event handler responsible for performing the RSocket transmission.
      */
     private class RSocketSendingEventHandler implements EventHandler<LogEvent<Event>>, LifecycleAware {
+        private RSocket socket;
 
-
-        private synchronized void openRSocketConnection() {
-
+        private synchronized RSocket openRSocketConnection() {
+            InetSocketAddress destination = destinations.get(0);
+            return RSocketFactory.connect()
+                            .transport(TcpClientTransport.create(getHostString(destination), destination.getPort()))
+                            .start()
+                            .block();
         }
 
         @Override
         public void onEvent(LogEvent<Event> eventLogEvent, long sequence, boolean endOfBatch) throws Exception {
-
+            byte[] json = encoder.encode(eventLogEvent.event);
+            socket.fireAndForget(DefaultPayload.create(json)).subscribe();
         }
 
         @Override
         public void onStart() {
-
+            try {
+                socket = openRSocketConnection();
+            } catch (Exception e) {
+                addError("Error opening RSocket", e);
+            }
         }
 
         @Override
         public void onShutdown() {
-
+            encoder.stop();
         }
     }
 
@@ -92,7 +109,22 @@ public class LogbackRSocketAppender<Event extends DeferredProcessingAware, Liste
             errorCount++;
             addError("No destination was configured. Use <destination> to add one or more destinations to the appender");
         }
-}
+
+        if (errorCount == 0) {
+            encoder.setContext(getContext());
+            if (!encoder.isStarted()) {
+                encoder.start();
+            }
+
+            started = true;
+            super.start();
+        }
+    }
+
+    @Override
+    public boolean isStarted() {
+        return started;
+    }
 
     public Encoder<Event> getEncoder() {
         return encoder;
