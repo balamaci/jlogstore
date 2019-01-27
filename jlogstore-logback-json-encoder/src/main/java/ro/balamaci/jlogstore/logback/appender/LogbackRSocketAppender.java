@@ -11,14 +11,12 @@ import net.logstash.logback.appender.destination.DestinationParser;
 import net.logstash.logback.appender.listener.TcpAppenderListener;
 import net.logstash.logback.encoder.com.lmax.disruptor.EventHandler;
 import net.logstash.logback.encoder.com.lmax.disruptor.LifecycleAware;
-import reactor.core.publisher.Mono;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * This class borrows much from the {@link net.logstash.logback.appender.AbstractLogstashTcpSocketAppender }
@@ -36,6 +34,7 @@ public class LogbackRSocketAppender<Event extends DeferredProcessingAware, Liste
      */
     private Encoder<Event> encoder;
 
+    private String clientId = "jlogstore";
 
     /**
      * Destinations to which to attempt to send logs, in order of preference.
@@ -68,7 +67,7 @@ public class LogbackRSocketAppender<Event extends DeferredProcessingAware, Liste
         @Override
         public void onEvent(LogEvent<Event> eventLogEvent, long sequence, boolean endOfBatch) throws Exception {
             byte[] json = encoder.encode(eventLogEvent.event);
-            socket.fireAndForget(DefaultPayload.create(json)).subscribe();
+            socket.fireAndForget(DefaultPayload.create(json, clientId.getBytes())).subscribe();
         }
 
         @Override
@@ -187,5 +186,7 @@ public class LogbackRSocketAppender<Event extends DeferredProcessingAware, Liste
         return destination.getHostString();
     }
 
-
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
 }

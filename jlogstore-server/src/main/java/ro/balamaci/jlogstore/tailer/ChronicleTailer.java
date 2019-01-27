@@ -2,6 +2,8 @@ package ro.balamaci.jlogstore.tailer;
 
 import net.openhft.chronicle.queue.ChronicleQueue;
 import net.openhft.chronicle.queue.ExcerptTailer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ro.balamaci.jlogstore.publisher.Publisher;
 import ro.balamaci.jlogstore.storage.ChronicleQueueStorage;
 
@@ -17,12 +19,14 @@ import java.util.concurrent.TimeUnit;
  */
 public class ChronicleTailer {
 
+    private static final Logger log = LoggerFactory.getLogger(ChronicleTailer.class);
+
     private volatile boolean shouldStop = false;
     private volatile boolean shouldStopIfNoDataAvailable = false;
 
     private Map<String, ExcerptTailer> tailerMap = new HashMap<>();
 
-    private static final int SLEEP_MILLIS_NO_DATA = 1000;
+    private static final int SLEEP_MILLIS_NO_DATA = 500;
 
     private ChronicleQueueStorage storage;
     private Publisher publisher;
@@ -42,6 +46,8 @@ public class ChronicleTailer {
 
     public void start() {
         executorService.submit(() -> {
+            log.info("Starting ChronicleTailer..");
+
             while (true) {
                 boolean dataWasAvailable = false;
 
@@ -54,6 +60,9 @@ public class ChronicleTailer {
                     int readItems = 0;
                     while (tailer.peekDocument()) {
                         String json = tailer.readText();
+                        if(json == null) {
+                            continue;
+                        }
 
                         readItems++;
                         dataWasAvailable = true;

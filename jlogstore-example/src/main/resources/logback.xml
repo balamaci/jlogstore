@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- 
+    For more configuration information and examples see
+    http://logback.qos.ch/manual/configuration.html
+-->
+<configuration debug="true" scan="false">
+    <appender name="STASH" class="ro.balamaci.jlogstore.logback.appender.LogbackRSocketAppender">
+        <!-- remoteHost and port are optional (default values shown) -->
+        <destination>localhost:7878</destination>
+        <clientId>example</clientId>
+
+        <!-- encoder is required -->
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <mdc/>
+
+                <context/>
+
+                <version/>
+
+                <logLevel/>
+                <loggerName/>
+
+                <pattern>
+                 <pattern>
+                    {
+                    "appName": "elk-testdata",
+                    "appVersion": "1.0"
+                    }
+                 </pattern>
+                </pattern>
+                <timestamp>
+                    <pattern>[UNIX_TIMESTAMP_AS_NUMBER]</pattern>
+                </timestamp>
+                <threadName/>
+
+                <message/>
+
+                <logstashMarkers/>
+                <arguments/>
+
+                <stackTrace/>
+            </providers>
+        </encoder>
+    </appender>
+    <!---->
+
+
+    <!-- Debugging appender (duplicates the normal log, PLUS any debug messages) -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%date{ISO8601} %level{5} %c{3} - %message%n</pattern>
+        </encoder>
+    </appender>
+    <!---->
+
+
+    <logger name="ro.balamaci.jlogstore.generator" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="STASH"/>
+    </logger>
+
+    <!-- ROOT logger setup -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+</configuration>

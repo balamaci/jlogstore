@@ -1,0 +1,29 @@
+{
+  "index_patterns" : ["example*"],
+  "settings" : {
+    "number_of_shards" : 1
+  },
+  "mappings": {
+    "_doc": {
+      "_source": {
+        "enabled": false
+      },
+      "properties": {
+        "remoteIP": {
+          "type": "ip"
+        },
+        "thread_name": {
+          "type": "keyword"
+        },
+        "username": {
+          "type": "keyword"
+        },
+        "timestamp": {
+            "type":   "date",
+            "format": "epoch_millis"
+        }
+      }
+    }
+  }
+}
+

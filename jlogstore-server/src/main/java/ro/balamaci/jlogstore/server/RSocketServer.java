@@ -4,16 +4,11 @@ import io.rsocket.AbstractRSocket;
 import io.rsocket.Frame;
 import io.rsocket.Payload;
 import io.rsocket.RSocketFactory;
-import io.rsocket.transport.netty.server.CloseableChannel;
 import io.rsocket.transport.netty.server.TcpServerTransport;
-import io.rsocket.util.DefaultPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 import ro.balamaci.jlogstore.storage.Storage;
-
-import java.util.concurrent.CountDownLatch;
 
 /**
  * @author sbalamaci
@@ -47,17 +42,11 @@ public class RSocketServer {
     private class LogServerReceiver extends AbstractRSocket {
 
         @Override
-        public Mono<Payload> requestResponse(Payload payload) {
-            System.out.println("Got " + payload.getDataUtf8());
-            return Mono.just(DefaultPayload.create("Accept"));
-        }
-
-        @Override
         public Mono<Void> fireAndForget(Payload payload) {
             String json = payload.getDataUtf8();
+            String clientId = payload.getMetadataUtf8();
 
-            log.info("Received {}", json);
-            storage.store("test", json);
+            storage.store(clientId, json);
             return Mono.empty();
         }
     }

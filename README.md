@@ -5,7 +5,7 @@ JLogStore is sort of Logstash written in Java but for a very specific usecase - 
 It can be viewed as a simple combination of Logstash and Kafka in the way that the log entries can be buffered locally in a very fast
 data structure similar to the Kafka log which means it's very fast while still not loosing log events.  
 
-JLogStore is composed of a Server part which listens for JSON log data being sent by the client. 
+JLogStore is composed of a Server part which listens for JSON log data being sent by the client which is done as a Logback Appender
 
 We built on top of to send the data directly from the Logback appender(for smaller latency when the log event is produced till it's processed), . 
 As long as you've got a JSON log source that you can ship to the server you're not locked in to using the logback appender.
