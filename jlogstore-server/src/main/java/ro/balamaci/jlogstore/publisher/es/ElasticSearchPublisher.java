@@ -35,9 +35,7 @@ public class ElasticSearchPublisher implements Publisher {
                 .forEach(file -> {
                     try {
                         String templateContent = new String(Files.readAllBytes(file.toPath()));
-                        log.info("Applying indexing template file '{}'", file.getName());
                         elasticSearchGateway.putIndexTemplate(file.getName(), templateContent);
-                        log.info("Applied indexing template file '{}'", file.getName());
                     } catch (IOException e) {
                         throw new RuntimeException("Could not load template file " + file.getAbsolutePath(), e);
                     }
@@ -46,10 +44,9 @@ public class ElasticSearchPublisher implements Publisher {
 
     @Override
     public void publish(String logId, String json) {
-        log.info("Indexing to ES {}", json);
         try {
             elasticSearchGateway.index(logId, json);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new PublishException(e);
         }
     }

@@ -6,9 +6,16 @@
   "mappings": {
     "_doc": {
       "_source": {
-        "enabled": false
+        "enabled": true
       },
       "properties": {
+        "message": {
+          "type": "text"
+        },
+        "@timestamp": {
+          "type":   "date",
+          "format": "epoch_millis"
+        },
         "remoteIP": {
           "type": "ip"
         },
@@ -18,9 +25,8 @@
         "username": {
           "type": "keyword"
         },
-        "timestamp": {
-            "type":   "date",
-            "format": "epoch_millis"
+        "stack_trace": {
+          "type": "text"
         }
       }
     }

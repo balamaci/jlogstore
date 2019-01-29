@@ -2,7 +2,6 @@ package ro.balamaci.jlogstore.generator.event.base;
 
 import io.codearte.jfairy.Fairy;
 import io.codearte.jfairy.producer.person.Person;
-import org.slf4j.MDC;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -20,8 +19,6 @@ public abstract class BaseEvent implements Runnable {
     @Override
     public void run() {
         waitBeforeStart();
-
-        MDC.put("timestampMillis", String.valueOf(System.currentTimeMillis()));
 
         doWork();
     }
