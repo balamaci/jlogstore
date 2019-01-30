@@ -64,7 +64,6 @@ public class ChronicleTailer {
                         while (tailer.peekDocument()) {
                             String json = tailer.readText();
                             if (json == null) {
-                                log.info("No items");
                                 continue;
                             }
 

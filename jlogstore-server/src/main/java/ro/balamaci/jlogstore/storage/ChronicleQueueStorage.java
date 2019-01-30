@@ -1,5 +1,7 @@
 package ro.balamaci.jlogstore.storage;
 
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
 import net.openhft.chronicle.core.io.Closeable;
 import net.openhft.chronicle.queue.ChronicleQueue;
 import net.openhft.chronicle.queue.ExcerptAppender;
@@ -18,6 +20,9 @@ public class ChronicleQueueStorage implements Storage {
 
     private String chronicleStorageDir;
 
+    public static final MetricRegistry metrics = new MetricRegistry();
+    private final Meter storageCounter = metrics.meter("storageCounter");
+
     private static final Logger log = LoggerFactory.getLogger(ChronicleQueueStorage.class);
 
     public ChronicleQueueStorage(String chronicleStorageDir) {
@@ -30,6 +35,7 @@ public class ChronicleQueueStorage implements Storage {
         try {
             ExcerptAppender appender = chronicleQueue.acquireAppender();
             appender.writeText(json);
+            storageCounter.mark();
         } catch (Exception e) {
             log.error("Error persisting message", e);
         }

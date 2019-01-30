@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ro.balamaci.jlogstore.storage.ChronicleQueueStorage;
 
 import java.util.concurrent.TimeUnit;
 
@@ -18,7 +19,7 @@ public class TimestampMeasuringPublisher implements Publisher {
 
     private final String timestampMillisNodeName;
 
-    private final Timer timed = StartPerf.metrics.timer("processedTime");
+    private final Timer timed = ChronicleQueueStorage.metrics.timer("processedTime");
 
     private long maxVal = 0;
 
@@ -44,9 +45,8 @@ public class TimestampMeasuringPublisher implements Publisher {
             long timeDifference = now - eventTime;
             if(timeDifference > maxVal) {
                 maxVal = timeDifference;
-                System.out.println("Max=" + maxVal);
             }
-
+            System.out.println("Received " + jsonString);
 //            processed.mark();
             timed.update(timeDifference, TimeUnit.MILLISECONDS);
         } catch (Exception e) {

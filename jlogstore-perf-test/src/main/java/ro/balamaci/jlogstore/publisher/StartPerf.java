@@ -1,7 +1,6 @@
 package ro.balamaci.jlogstore.publisher;
 
 import com.codahale.metrics.ConsoleReporter;
-import com.codahale.metrics.MetricRegistry;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import ro.balamaci.jlogstore.server.RSocketServer;
@@ -13,13 +12,9 @@ import java.util.concurrent.TimeUnit;
 
 public class StartPerf {
 
-    static final MetricRegistry metrics = new MetricRegistry();
-
     private static final String JSON_FIELD_NAME_TIMESTAMP_MILLIS = "@timestamp";
     
     public static void main(String[] args) throws Exception {
-        initDropwizardReporter();
-
         Config config = ConfigFactory.load("jlogstore-server.conf");
 
 
@@ -32,13 +27,15 @@ public class StartPerf {
         ChronicleTailer chronicleTailer = new ChronicleTailer(chronicleQueueStorage, publisher, 100);
         chronicleTailer.start();
 
+        initDropwizardReporter();
+
         RSocketServer RSocketServer = new RSocketServer(config.getString("server.bindAddress"),
                 config.getInt("server.port"), chronicleQueueStorage);
         RSocketServer.start();
     }
 
     private static void initDropwizardReporter() {
-        ConsoleReporter reporter = ConsoleReporter.forRegistry(metrics)
+        ConsoleReporter reporter = ConsoleReporter.forRegistry(ChronicleQueueStorage.metrics)
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
                 .build();
