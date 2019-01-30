@@ -1,10 +1,12 @@
 package ro.balamaci.jlogstore.publisher;
 
+import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.HdrHistogram.Histogram;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -16,25 +18,19 @@ public class TimestampMeasuringPublisher implements Publisher {
 
     private final String timestampMillisNodeName;
 
-    private Histogram histogram = new Histogram(0);
-
-    private int eventsProcessed;
-
-    private int numberOfEventsToShowHistogramStats;
+    private final Timer timed = StartPerf.metrics.timer("processedTime");
 
     private long maxVal = 0;
 
 
-    public TimestampMeasuringPublisher(String timestampMillisNodeName, int numberOfEventsToShowHistogramStats) {
+    public TimestampMeasuringPublisher(String timestampMillisNodeName) {
         this.timestampMillisNodeName = timestampMillisNodeName;
-        this.numberOfEventsToShowHistogramStats = numberOfEventsToShowHistogramStats;
     }
 
     @Override
     public void publish(String logId, String jsonString) {
         try {
             long now = System.currentTimeMillis();
-            eventsProcessed ++;
 
             JsonParser parser = factory.createParser(jsonString);
             JsonNode jsonNode = mapper.readTree(parser);
@@ -48,14 +44,11 @@ public class TimestampMeasuringPublisher implements Publisher {
             long timeDifference = now - eventTime;
             if(timeDifference > maxVal) {
                 maxVal = timeDifference;
-                System.out.println("** Max=" + maxVal + " " + jsonString);
+                System.out.println("Max=" + maxVal);
             }
-            System.out.println("crt=" + timeDifference + " Max=" + maxVal + " " + jsonString);
 
-            histogram.recordValue(timeDifference);
-            if(eventsProcessed % numberOfEventsToShowHistogramStats == 0) {
-                histogram.outputPercentileDistribution(System.out, 1.0);
-            }
+//            processed.mark();
+            timed.update(timeDifference, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
             e.printStackTrace();
         }

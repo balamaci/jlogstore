@@ -10,7 +10,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public abstract class BaseEvent implements Runnable {
 
-    private int minWaitMs = 50;
+    private int minWaitMs = 0;
     private int maxWaitMs = 250;
 
 
@@ -18,7 +18,7 @@ public abstract class BaseEvent implements Runnable {
 
     @Override
     public void run() {
-        waitBeforeStart();
+//        waitBeforeStart();
 
         doWork();
     }

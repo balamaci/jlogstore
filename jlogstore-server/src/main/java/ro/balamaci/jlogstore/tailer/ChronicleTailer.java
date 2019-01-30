@@ -26,7 +26,7 @@ public class ChronicleTailer {
 
     private Map<String, ExcerptTailer> tailerMap = new HashMap<>();
 
-    private static final int SLEEP_MILLIS_NO_DATA = 500;
+    private static final int SLEEP_MILLIS_NO_DATA = 100;
 
     private ChronicleQueueStorage storage;
     private Publisher publisher;
@@ -40,8 +40,10 @@ public class ChronicleTailer {
         this.itemsToRead = itemsToRead;
     }
 
-    private ExcerptTailer createExcerptTailer(ChronicleQueue chronicleQueue) {
-        return chronicleQueue.createTailer();
+    private ExcerptTailer createExcerptTailer(String clientLoggerId, ChronicleQueue chronicleQueue) {
+        log.info("Creating Queue Tailer for {}", clientLoggerId);
+
+        return chronicleQueue.createTailer().toStart();
     }
 
     public void start() {
@@ -55,35 +57,41 @@ public class ChronicleTailer {
                 while (logIds.hasMoreElements()) {
                     String logId = logIds.nextElement();
                     ExcerptTailer tailer = tailerMap.computeIfAbsent(logId,
-                            (id) -> createExcerptTailer(storage.getQueues().get(id)));
+                            (id) -> createExcerptTailer(id, storage.getQueues().get(id)));
 
                     int readItems = 0;
-                    while (tailer.peekDocument()) {
-                        String json = tailer.readText();
-                        if(json == null) {
-                            continue;
+                    try {
+                        while (tailer.peekDocument()) {
+                            String json = tailer.readText();
+                            if (json == null) {
+                                log.info("No items");
+                                continue;
+                            }
+
+                            readItems++;
+                            dataWasAvailable = true;
+
+                            publisher.publish(logId, json);
+
+                            if (readItems > itemsToRead) {
+                                break;
+                            }
                         }
-
-                        readItems++;
-                        dataWasAvailable = true;
-
-                        publisher.publish(logId, json);
-
-                        if (readItems > itemsToRead) {
-                            break;
-                        }
+                    } catch (Exception e) {
+                        log.error("Error reading queue", e);
                     }
                 }
 
                 if (shouldStop) {
                     break;
                 } else {
-                    if (!dataWasAvailable) {
+                    if (! dataWasAvailable) {
                         if(shouldStopIfNoDataAvailable) {
                             break;
                         }
 
                         try {
+                            log.info("No data available - sleeping... ");
                             Thread.sleep(SLEEP_MILLIS_NO_DATA);
                         } catch (InterruptedException ignore) { }
                     }
